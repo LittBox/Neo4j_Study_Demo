@@ -31,11 +31,20 @@ yarn-error.log*
 
 # Node / frontend
 /frontend/node_modules/
-node_modules/
+/node_modules/
+/frontend/node_modules/
 /frontend/dist/
-dist/
+/dist/
 .vite/
 /frontend/.vite/
+
+# Lock / package files (optional to ignore if you want deterministic installs)
+package-lock.json
+yarn.lock
+
+# Temporary build artifacts
+/.parcel-cache/
+/.turbo/
 
 # Environment files
 .env
