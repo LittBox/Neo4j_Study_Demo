@@ -20,7 +20,6 @@ KnoledgeMap/
           │   └── AiController.java        # /api/chat
           ├── service/
           │   ├── DeepseekService.java     # 调用 https://api.deepseek.com
-          │   └── OpenAiService.java       # （legacy/可选）
           └── resources/
                 └── application.yml          # 配置（DEEPSEEK_API_KEY 等）
 └── frontend/
@@ -94,85 +93,12 @@ POST /api/chat
 
 备注：前端 `ChatView.vue` 已将输入的文本作为 `prompt` 发送到该接口。
 
-## 本地开发注意事项
-
-- 请不要将密钥写入仓库，使用环境变量或安全配置管理。
-- 我已添加 `.gitignore`，排除了 `node_modules/`、前端构建产物等。
-- 如果需要切换为 OpenAI 或其它 Agent，请查看 `backend/src/main/java/com/medical/service/` 下的实现。
-
-## 常见调试命令
-
-运行后端并查看日志：
-```bash
-cd backend
-mvn spring-boot:run
-```
-
-运行前端：
-```bash
-cd frontend
-npm run dev
-```
-
-测试 API（curl 示例）：
-```bash
-curl -X POST http://localhost:8080/api/chat -H "Content-Type: application/json" -d '{"prompt":"今天天气如何"}'
-```
-
 ## 变更历史（简短）
 
 - 已实现 `DeepseekService` 并在 `AiController` 中集成；前端 `ChatView.vue` 发送 `prompt` 字段并显示 `content`。
 - 添加并更新了 `.gitignore`，已移除不应提交的 `node_modules`。
 
 ---
-
-如需我把 README 提交到 Git（commit）或把 README 的某部分换成英文/更详细示例，请告诉我。 
-
-# 医疗问答系统框架说明
-
-## 项目概述
-
-这是一个基于知识图谱的医疗问答AI辅助回答助手，采用前后端分离架构：
-- **前端**：Vue 3 + Vite
-- **后端**：Spring Boot 3 + Neo4j
-
-## 项目结构
-
-```
-KnoledgeMap/
-├── backend/                    # Spring Boot后端
-│   ├── src/main/java/com/medical/
-│   │   ├── controller/        # API控制器
-│   │   │   └── QaController.java
-│   │   ├── service/           # 业务逻辑层
-│   │   │   └── QaService.java
-│   │   ├── repository/        # 数据访问层
-│   │   │   ├── QuestionRepository.java
-│   │   │   └── MedicalEntityRepository.java
-│   │   ├── model/             # 实体模型
-│   │   │   ├── Question.java
-│   │   │   ├── Answer.java
-│   │   │   └── MedicalEntity.java
-│   │   ├── dto/               # 数据传输对象
-│   │   │   ├── QuestionRequest.java
-│   │   │   └── QuestionResponse.java
-│   │   └── MedicalQaApplication.java
-│   ├── src/main/resources/
-│   │   └── application.properties
-│   └── pom.xml
-│
-└── frontend/                   # Vue前端
-    ├── src/
-    │   ├── components/
-    │   │   ├── QuestionArea.vue      # 提问区组件
-    │   │   └── AnswerArea.vue        # 回答区组件
-    │   ├── App.vue                   # 根组件
-    │   └── main.js
-    ├── public/
-    ├── index.html
-    ├── package.json
-    └── vite.config.js
-```
 
 ## 功能描述
 
@@ -216,7 +142,7 @@ KnoledgeMap/
 
 1. **配置Neo4j**
    ```
-   修改 backend/src/main/resources/application.properties
+   修改 backend/src/main/resources/application.yml
    更新Neo4j连接参数
    ```
 
@@ -320,4 +246,4 @@ Content-Type: application/json
 
 ---
 
-**开发团队** | **2025年**
+**开发团队** | **2026年**

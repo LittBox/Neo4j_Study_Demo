@@ -15,7 +15,7 @@ server:
 # Deepseek API Configuration
 deepseek:
   api:
-    key: sk-60d66670e675480d95b07d3d41610b64
+    key: ${DEEPSEEK_API_KEY:}
     model: deepseek-chat
     baseUrl: https://api.deepseek.com/
 
