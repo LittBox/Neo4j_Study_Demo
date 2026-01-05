@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: medical-qa
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: neo4j
+      password: password
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# Deepseek API Configuration
+deepseek:
+  api:
+    key: sk-60d66670e675480d95b07d3d41610b64
+    model: deepseek-chat
+    baseUrl: https://api.deepseek.com/
+
+logging:
+  level:
+    root: INFO
+    com.medical: DEBUG
+    org.springframework.web: DEBUG

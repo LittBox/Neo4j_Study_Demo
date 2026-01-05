@@ -1,0 +1,82 @@
+# Java / Maven
+/backend/target/
+**/target/
+*.jar
+*.war
+*.ear
+
+# Maven wrapper (optional)
+.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node / frontend
+/frontend/node_modules/
+node_modules/
+/frontend/dist/
+dist/
+.vite/
+/frontend/.vite/
+
+# Environment files
+.env
+.env.*
+.env.local
+
+# Build / output
+bin/
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary / swap
+*.tmp
+*.swp
+*~
+
+# Compiled classes
+*.class
+
+# Coverage
+coverage/
+
+# Misc
+.idea_modules/
+.idea_workspace/
+
+# JetBrains
+*.iml
+
+# Logs and runtime
+*.pid
+*.seed
+
+# Backup files
+*.bak
+
+# local application config (if you keep API keys locally)
+local.env
+
+# End of file
