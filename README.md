@@ -1,3 +1,133 @@
+# 医疗问答系统（KnowledgeMap）
+
+简洁说明、运行与接口文档（基于当前代码树）
+
+## 项目概述
+
+这是一个前后端分离的医疗问答项目：
+- 后端：Spring Boot（Java 21）、Neo4j，用于知识图谱查询与 AI Agent 接口调用（Deepseek/其他）。
+- 前端：Vue 3 + Vite，提供问答 UI 并调用后端 `/api/chat` 接口。
+
+## 当前主要文件/目录（摘录）
+
+```
+KnoledgeMap/
+├── backend/
+│   ├── pom.xml
+    └── src/main/java/com/medical/
+          ├── MedicalQaApplication.java
+          ├── controller/
+          │   └── AiController.java        # /api/chat
+          ├── service/
+          │   ├── DeepseekService.java     # 调用 https://api.deepseek.com
+          │   └── OpenAiService.java       # （legacy/可选）
+          └── resources/
+                └── application.yml          # 配置（DEEPSEEK_API_KEY 等）
+└── frontend/
+      ├── index.html
+      ├── package.json
+      └── src/
+            ├── main.js
+            └── views/
+                  └── ChatView.vue            # 提问文本框 -> POST /api/chat
+```
+
+## 环境与配置
+
+- Java 21、Maven、Node 及 npm
+- 在 `backend/src/main/resources/application.yml` 中读取 Deepseek API 配置：
+
+```yaml
+deepseek:
+   api:
+      key: ${DEEPSEEK_API_KEY:}
+      model: deepseek-chat
+      baseUrl: https://api.deepseek.com/
+```
+
+请在运行前设置环境变量（示例）：
+
+Windows PowerShell:
+```powershell
+$env:DEEPSEEK_API_KEY = "your-api-key-here"
+```
+
+Linux / macOS:
+```bash
+export DEEPSEEK_API_KEY=your-api-key-here
+```
+
+## 运行说明
+
+后端：
+```bash
+cd backend
+mvn clean package
+mvn spring-boot:run
+```
+
+后端默认监听： `http://localhost:8080`
+
+前端：
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+前端开发服务器（Vite）通常为 `http://localhost:5173`。
+
+## 后端 API（当前已实现）
+
+POST /api/chat
+- 请求体：`{ "prompt": "文本内容" }`
+- 返回（成功示例）：
+
+```json
+{
+   "success": true,
+   "content": "Deepseek 或 Agent 返回的文本"
+}
+```
+
+错误返回包含 `success:false` 和 `error` 字段。
+
+备注：前端 `ChatView.vue` 已将输入的文本作为 `prompt` 发送到该接口。
+
+## 本地开发注意事项
+
+- 请不要将密钥写入仓库，使用环境变量或安全配置管理。
+- 我已添加 `.gitignore`，排除了 `node_modules/`、前端构建产物等。
+- 如果需要切换为 OpenAI 或其它 Agent，请查看 `backend/src/main/java/com/medical/service/` 下的实现。
+
+## 常见调试命令
+
+运行后端并查看日志：
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+运行前端：
+```bash
+cd frontend
+npm run dev
+```
+
+测试 API（curl 示例）：
+```bash
+curl -X POST http://localhost:8080/api/chat -H "Content-Type: application/json" -d '{"prompt":"今天天气如何"}'
+```
+
+## 变更历史（简短）
+
+- 已实现 `DeepseekService` 并在 `AiController` 中集成；前端 `ChatView.vue` 发送 `prompt` 字段并显示 `content`。
+- 添加并更新了 `.gitignore`，已移除不应提交的 `node_modules`。
+
+---
+
+如需我把 README 提交到 Git（commit）或把 README 的某部分换成英文/更详细示例，请告诉我。 
+
 # 医疗问答系统框架说明
 
 ## 项目概述
