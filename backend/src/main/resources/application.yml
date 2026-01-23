@@ -15,12 +15,17 @@ server:
 # Deepseek API Configuration
 deepseek:
   api:
-    key: ${DEEPSEEK_API_KEY:}
+    key: sk-60d66670e675480d95b07d3d41610b64
     model: deepseek-chat
     baseUrl: https://api.deepseek.com/
 
 logging:
   level:
+    # 让 Spring MVC 分发器 servlet 打印 ERROR 级别的异常（包含堆栈）
+    org.springframework.web.servlet.DispatcherServlet: ERROR
+    # 让你的控制器包打印 DEBUG 级别的日志（方便看请求参数）
+    com.medical.controller: DEBUG
+    # 让你的服务包打印 DEBUG 级别的日志（方便看业务逻辑）
+    com.medical.service: DEBUG
+    # 根日志级别调整为 INFO（避免冗余，同时保留异常）
     root: INFO
-    com.medical: DEBUG
-    org.springframework.web: DEBUG

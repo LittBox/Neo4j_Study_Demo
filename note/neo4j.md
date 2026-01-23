@@ -36,3 +36,5 @@ A[用户提问] --> B[解析问题，从知识图谱查相关信息]
 B --> C[将知识图谱结果+问题一起传给大模型]
 C --> D[大模型基于结构化信息生成答案]
 ```
+
+deepseek api接口使用查询官网：https://platform.deepseek.com/api_keys    
