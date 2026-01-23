@@ -1,2 +1,5 @@
 D:\KnoledgeMap\backend\src\main\java\com\medical\controller\AiController.java
+D:\KnoledgeMap\backend\src\main\java\com\medical\repository\DiseaseRepository.java
+D:\KnoledgeMap\backend\src\main\java\com\medical\entity\neo4j\Disease.java
+D:\KnoledgeMap\backend\src\main\java\com\medical\service\DeepseekService.java
 D:\KnoledgeMap\backend\src\main\java\com\medical\MedicalQaApplication.java
