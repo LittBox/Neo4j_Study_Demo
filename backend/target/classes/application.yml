@@ -21,11 +21,21 @@ deepseek:
 
 logging:
   level:
-    # 让 Spring MVC 分发器 servlet 打印 ERROR 级别的异常（包含堆栈）
+    # Spring 相关
     org.springframework.web.servlet.DispatcherServlet: ERROR
-    # 让你的控制器包打印 DEBUG 级别的日志（方便看请求参数）
+    org.springframework.web.client.RestTemplate: DEBUG  # 添加这个
+    
+    # 应用相关
+    com.medical: DEBUG
     com.medical.controller: DEBUG
-    # 让你的服务包打印 DEBUG 级别的日志（方便看业务逻辑）
     com.medical.service: DEBUG
-    # 根日志级别调整为 INFO（避免冗余，同时保留异常）
-    root: INFO
+    
+    # Neo4j
+    org.neo4j: WARN
+    
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %-5level [%thread] %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} - %-5level [%thread] %logger{36} - %msg%n"
+  
+  file:
+    name: logs/medical-qa.log
