@@ -1,11 +1,51 @@
 spring:
   application:
     name: medical-qa
+  
+  # MySQL数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/health_management?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 654321
+  
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  
+  # Jackson配置
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+    time-zone: UTC
+    default-property-inclusion: non_null
+  
+  # Neo4j配置
   neo4j:
     uri: bolt://localhost:7687
     authentication:
       username: neo4j
       password: 12345678900
+  
+  # Redis配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 
+      database: 0
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+        shutdown-timeout: 100ms
 
 server:
   port: 8080
@@ -18,6 +58,26 @@ deepseek:
     key: sk-60d66670e675480d95b07d3d41610b64
     model: deepseek-chat
     baseUrl: https://api.deepseek.com/
+
+# JWT配置
+jwt:
+  secret: health-management-secret-key-2024-very-long-secret-key-for-security
+  expiration: 86400000 # 24小时，单位：毫秒
+
+# Swagger/Knife4j配置
+knife4j:
+  enable: true
+  openapi:
+    title: 个人健康管理系统API文档
+    description: 个人健康管理系统API接口文档
+    version: 1.0.0
+    contact:
+      name: Health Management System
+    license: Apache 2.0
+    license-url: https://www.apache.org/licenses/LICENSE-2.0.html
+    servers:
+      - url: http://localhost:8080
+        description: 本地环境
 
 logging:
   level:

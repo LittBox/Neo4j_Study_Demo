@@ -1,24 +1,29 @@
 package com.medical.entity.neo4j;
-import lombok.Data;
 
+import lombok.Data;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 
-
+/**
+ * 疾病节点
+ */
 @Data
-@Node("Disease") // 对应节点标签 Disease
+@Node("Disease")
 public class Disease {
-    @Id // 主键
+    
+    @Id
     private Long id;
-
-    @Property("name") // 节点属性
+    
+    @Property("name")
     private String name;
-
+    
     @Property("type")
     private String type;
-
+    
     @Property("intro")
     private String intro;
-
+    
+    @Property("incidence")
+    private String incidence; // 发病率
 }

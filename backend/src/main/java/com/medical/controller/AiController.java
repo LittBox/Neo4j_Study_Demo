@@ -1,63 +1,66 @@
 package com.medical.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.medical.service.DeepseekService;
+import com.medical.common.Result;
+import com.medical.entity.mysql.AiQaHistory;
+import com.medical.service.AiQaService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * AI问答控制器
+ */
+@Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/ai")
 @CrossOrigin(origins = "*")
 public class AiController {
-
-	private final ObjectMapper mapper = new ObjectMapper();
-
-	@Autowired
-	private DeepseekService deepseekService;
-
-	@PostMapping("/chat")
-	public ResponseEntity<?> chat(@RequestBody Map<String, String> body) {
-		try {
-			String prompt = body.getOrDefault("prompt", "");
-
-			if (prompt == null || prompt.trim().isEmpty()) {
-				ObjectNode errorResponse = mapper.createObjectNode();
-				errorResponse.put("success", false);
-				errorResponse.put("error", "Prompt cannot be empty");
-				return ResponseEntity.badRequest().body(errorResponse);
-			}
-
-			// Call Deepseek service to generate text
-			String content = deepseekService.generateText(prompt);
-
-			// Build success response
-			ObjectNode result = mapper.createObjectNode();
-			result.put("success", true);
-			result.put("content", content);
-
-			return ResponseEntity.ok(result);
-
-		} catch (IllegalArgumentException e) {
-			ObjectNode errorResponse = mapper.createObjectNode();
-			errorResponse.put("success", false);
-			errorResponse.put("error", e.getMessage());
-			return ResponseEntity.badRequest().body(errorResponse);
-		} catch (Exception e) {
-			ObjectNode errorResponse = mapper.createObjectNode();
-			errorResponse.put("success", false);
-			errorResponse.put("error", e.getMessage());
-			errorResponse.put("errorType", e.getClass().getSimpleName());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-		}
-	}
-
+    
+    @Autowired
+    private AiQaService aiQaService;
+    
+    /**
+     * AI问答
+     */
+    @PostMapping("/chat")
+    public Result<Map<String, String>> chat(@RequestBody Map<String, Object> body,
+                                             HttpServletRequest request) {
+        String question = (String) body.get("question");
+        @SuppressWarnings("unchecked")
+        List<String> history = (List<String>) body.get("history");
+        
+        if (question == null || question.trim().isEmpty()) {
+            return Result.error(400, "问题不能为空");
+        }
+        
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            return Result.error(401, "用户未登录");
+        }
+        String answer = aiQaService.chat(userId, question, history);
+        
+        Map<String, String> data = new HashMap<>();
+        data.put("question", question);
+        data.put("answer", answer);
+        
+        return Result.success("问答成功", data);
+    }
+    
+    /**
+     * 获取问答历史
+     */
+    @GetMapping("/history")
+    public Result<List<AiQaHistory>> getHistory(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            return Result.error(401, "用户未登录");
+        }
+        List<AiQaHistory> history = aiQaService.getHistory(userId);
+        return Result.success(history);
+    }
 }

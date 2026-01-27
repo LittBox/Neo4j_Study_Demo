@@ -16,7 +16,7 @@ public class Neo4jSingleDataTest {
     public void testCreateDisease() {
         // 构建疾病数据
         Disease disease = new Disease();
-        disease.setId(2L);
+      
         disease.setName("冠心病");
         disease.setType("心血管疾病");
         disease.setIntro("冠状动脉粥样硬化导致的心脏病");
