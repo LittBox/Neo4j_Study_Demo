@@ -1,9 +1,11 @@
 package com.medical.controller;
 
 import com.medical.common.Result;
+import com.medical.dto.ChangePasswordDTO;
 import com.medical.dto.LoginDTO;
 import com.medical.dto.RegisterDTO;
 import com.medical.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +46,19 @@ public class AuthController {
         Map<String, String> data = new HashMap<>();
         data.put("token", token);
         return Result.success("登录成功", data);
+    }
+
+    /**
+     * 修改密码
+     */
+    @PostMapping("/change-password")
+    public Result<?> changePassword(@Valid @RequestBody ChangePasswordDTO dto,
+                                    HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) {
+            return Result.error(401, "用户未登录");
+        }
+        authService.changePassword(userId, dto);
+        return Result.success();
     }
 }

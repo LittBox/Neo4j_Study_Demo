@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 知识图谱控制器
@@ -27,7 +26,7 @@ public class KnowledgeGraphController {
      */
     @GetMapping("/disease")
     public Result<GraphData> getDiseaseGraph(@RequestParam String diseaseName,
-                                             @RequestParam(defaultValue = "2") int depth) {
+                                             @RequestParam(defaultValue = "4") int depth) {
         GraphData graphData = knowledgeGraphService.getDiseaseGraph(diseaseName, depth);
         return Result.success(graphData);
     }
@@ -48,5 +47,11 @@ public class KnowledgeGraphController {
     public Result<List<Object>> getAllDiseases() {
         List<Object> diseases = knowledgeGraphService.getAllDiseases();
         return Result.success(diseases);
+    }
+
+    @GetMapping("/full")
+    public Result<GraphData> getFullGraph(@RequestParam(defaultValue = "2") int depth,
+                                          @RequestParam(defaultValue = "300") int limit) {
+        return Result.success(knowledgeGraphService.getFullGraph(depth, limit));
     }
 }

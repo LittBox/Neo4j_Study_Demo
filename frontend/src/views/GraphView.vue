@@ -37,9 +37,11 @@ const loading = ref(false)
 const diseases = ref([])
 const selectedDisease = ref('')
 let chartInstance = null
+let fullGraphData = null
 
 onMounted(() => {
   loadDiseases()
+  loadFullGraph()
 })
 
 onUnmounted(() => {
@@ -70,7 +72,7 @@ const loadGraph = async () => {
   
   loading.value = true
   try {
-    const res = await graphApi.getDiseaseGraph(selectedDisease.value, 2)
+    const res = await graphApi.getDiseaseGraph(selectedDisease.value, 4)
     const graphData = res.data
     
     if (!graphData || (!graphData.nodes || graphData.nodes.length === 0)) {
@@ -82,6 +84,22 @@ const loadGraph = async () => {
     initGraph(graphData)
   } catch (error) {
     ElMessage.error('加载图谱失败：' + (error.message || '未知错误'))
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadFullGraph = async () => {
+  loading.value = true
+  try {
+    const res = await graphApi.getFullGraph(2, 300)
+    fullGraphData = res.data
+    if (fullGraphData && fullGraphData.nodes && fullGraphData.nodes.length) {
+      await nextTick()
+      initGraph(fullGraphData)
+    }
+  } catch (error) {
+    // 静默失败，不影响后续按疾病加载
   } finally {
     loading.value = false
   }
@@ -145,6 +163,12 @@ const initGraph = (graphData) => {
         lineStyle: {
           color: 'source',
           curveness: 0.3
+        },
+        edgeLabel: {
+          show: true,
+          formatter: (params) => params?.data?.name || '',
+          color: '#666',
+          fontSize: 12
         },
         emphasis: {
           focus: 'adjacency',

@@ -1,6 +1,7 @@
 <template>
   <el-container class="main-layout">
-    <el-aside width="200px" class="sidebar">
+    <div v-if="isMobile && sidebarOpen" class="mobile-mask" @click="closeSidebar"></div>
+    <el-aside width="200px" :class="['sidebar', { 'sidebar--open': sidebarOpen && isMobile }]">
       <div class="logo">
         <h2>健康管理</h2>
       </div>
@@ -8,6 +9,7 @@
         :default-active="activeMenu"
         router
         class="sidebar-menu"
+        @select="handleMenuSelect"
       >
         <el-menu-item index="/home">
           <el-icon><House /></el-icon>
@@ -41,6 +43,9 @@
     </el-aside>
     <el-container>
       <el-header class="header">
+        <button class="mobile-menu-btn" type="button" @click="toggleSidebar" aria-label="打开菜单">
+          <el-icon><Menu /></el-icon>
+        </button>
         <div class="header-right">
           <el-dropdown @command="handleCommand">
             <span class="user-info">
@@ -63,7 +68,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { ElMessage } from 'element-plus'
@@ -74,6 +79,7 @@ import {
   Share,
   ChatLineRound,
   Box,
+  Menu,
   Setting,
   User
 } from '@element-plus/icons-vue'
@@ -83,6 +89,36 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const activeMenu = computed(() => route.path)
+
+const isMobile = ref(false)
+const sidebarOpen = ref(false)
+
+const updateIsMobile = () => {
+  isMobile.value = window.matchMedia('(max-width: 600px)').matches
+  if (!isMobile.value) sidebarOpen.value = false
+}
+
+onMounted(() => {
+  updateIsMobile()
+  window.addEventListener('resize', updateIsMobile)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateIsMobile)
+})
+
+const toggleSidebar = () => {
+  if (!isMobile.value) return
+  sidebarOpen.value = !sidebarOpen.value
+}
+
+const closeSidebar = () => {
+  sidebarOpen.value = false
+}
+
+const handleMenuSelect = () => {
+  if (isMobile.value) closeSidebar()
+}
 
 const handleCommand = (command) => {
   if (command === 'logout') {
@@ -128,6 +164,21 @@ const handleCommand = (command) => {
   padding: 0 20px;
 }
 
+.mobile-menu-btn {
+  display: none;
+  margin-right: auto;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.mobile-mask {
+  display: none;
+}
+
 .user-info {
   display: flex;
   align-items: center;
@@ -139,5 +190,33 @@ const handleCommand = (command) => {
 .main-content {
   background-color: var(--bg-color);
   padding: 20px;
+}
+
+@media (max-width: 600px) {
+  .header {
+    background-color: var(--primary-color);
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+    justify-content: space-between;
+    padding: 0 12px;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+
+  .mobile-mask {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 999;
+  }
+
+  .user-info {
+    color: #fff;
+  }
 }
 </style>

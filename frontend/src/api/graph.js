@@ -25,5 +25,14 @@ export const graphApi = {
       url: '/api/graph/diseases',
       method: 'get'
     })
+  },
+
+  // 获取全量图谱（初始展示）
+  getFullGraph(depth = 2, limit = 300) {
+    return request({
+      url: '/api/graph/full',
+      method: 'get',
+      params: { depth, limit }
+    })
   }
 }

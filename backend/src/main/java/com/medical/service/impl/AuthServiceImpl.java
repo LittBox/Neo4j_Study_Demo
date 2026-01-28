@@ -1,5 +1,6 @@
 package com.medical.service.impl;
 
+import com.medical.dto.ChangePasswordDTO;
 import com.medical.dto.LoginDTO;
 import com.medical.dto.RegisterDTO;
 import com.medical.entity.mysql.User;
@@ -74,5 +75,20 @@ public class AuthServiceImpl implements AuthService {
         
         // 生成Token
         return jwtUtil.generateToken(user.getId(), user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(Long userId, ChangePasswordDTO dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(404, "用户不存在"));
+
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new BusinessException(400, "旧密码不正确");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+        log.info("用户修改密码成功，userId={}", userId);
     }
 }

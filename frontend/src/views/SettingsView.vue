@@ -50,6 +50,7 @@
 <script setup>
 import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
+import { authApi } from '@/api/auth'
 
 const profileForm = reactive({
   username: '',
@@ -68,7 +69,7 @@ const saveProfile = () => {
   ElMessage.success('保存成功')
 }
 
-const changePassword = () => {
+const changePassword = async () => {
   if (!passwordForm.oldPassword || !passwordForm.newPassword) {
     ElMessage.warning('请填写完整信息')
     return
@@ -77,7 +78,18 @@ const changePassword = () => {
     ElMessage.warning('两次输入的密码不一致')
     return
   }
-  ElMessage.success('密码修改成功')
+  try {
+    await authApi.changePassword({
+      oldPassword: passwordForm.oldPassword,
+      newPassword: passwordForm.newPassword
+    })
+    ElMessage.success('密码修改成功')
+    passwordForm.oldPassword = ''
+    passwordForm.newPassword = ''
+    passwordForm.confirmPassword = ''
+  } catch (error) {
+    ElMessage.error(error.message || '密码修改失败')
+  }
 }
 </script>
 

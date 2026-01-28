@@ -140,3 +140,42 @@
     height: 400px;
   }
 }
+
+/* 移动端适配 */
+@media (max-width: 600px) {
+  body {
+    font-size: 13px;
+  }
+  .main-layout {
+    flex-direction: row;
+  }
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -220px;
+    width: 200px !important;
+    height: 100vh;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  .sidebar.sidebar--open {
+    left: 0;
+  }
+  /* 仅保留左侧抽屉，不将菜单放到顶部 */
+  .sidebar-menu {
+    display: block;
+  }
+  .main-content {
+    padding: 12px;
+  }
+  .health-card {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .el-table {
+    font-size: 12px;
+  }
+  .el-form-item__label {
+    padding-right: 6px;
+  }
+}

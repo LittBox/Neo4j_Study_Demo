@@ -64,7 +64,7 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
                     GraphNode gn = new GraphNode();
                     gn.setId(String.valueOf(id));
                     gn.setName(n.get("name").asString(""));
-                    String category = n.labels().stream().findFirst().orElse("other");
+                    String category = n.labels().iterator().hasNext() ? n.labels().iterator().next() : "other";
                     gn.setCategory(category.toLowerCase());
                     switch (category) {
                         case "Disease": gn.setSymbolSize(30); break;
@@ -97,6 +97,83 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         }
 
         return graphData;
+    }
+
+    @Override
+    public GraphData getFullGraph(int depth, int limit) {
+        String cacheKey = "graph:full:depth:" + depth + ":limit:" + limit;
+        Object cached = redisUtil.get(cacheKey);
+        if (cached != null) {
+            return (GraphData) cached;
+        }
+
+        GraphData graphData = new GraphData();
+        Map<Long, GraphNode> nodeMap = new HashMap<>();
+        Set<String> linkSet = new HashSet<>();
+        List<GraphLink> links = new ArrayList<>();
+
+        String cypher = "MATCH p=()-[*1.." + depth + "]-() " +
+                "RETURN nodes(p) AS ns, relationships(p) AS rs " +
+                "LIMIT $limit";
+
+        try {
+            Collection<Map<String, Object>> rows = neo4jClient.query(cypher)
+                    .bindAll(Map.of("limit", limit))
+                    .fetch().all();
+
+            for (Map<String, Object> row : rows) {
+                @SuppressWarnings("unchecked")
+                List<org.neo4j.driver.types.Node> ns = (List<org.neo4j.driver.types.Node>) row.get("ns");
+                @SuppressWarnings("unchecked")
+                List<org.neo4j.driver.types.Relationship> rs = (List<org.neo4j.driver.types.Relationship>) row.get("rs");
+
+                if (ns != null) {
+                    for (org.neo4j.driver.types.Node n : ns) {
+                        long id = n.id();
+                        if (nodeMap.containsKey(id)) continue;
+                        GraphNode gn = new GraphNode();
+                        gn.setId(String.valueOf(id));
+                        gn.setName(n.get("name").asString(""));
+                        String category = n.labels().iterator().hasNext() ? n.labels().iterator().next() : "other";
+                        gn.setCategory(category.toLowerCase());
+                        switch (category) {
+                            case "Disease": gn.setSymbolSize(30); break;
+                            case "Symptom": gn.setSymbolSize(20); break;
+                            case "RiskFactor": gn.setSymbolSize(20); break;
+                            case "Treatment": gn.setSymbolSize(25); break;
+                            case "Drug": gn.setSymbolSize(15); break;
+                            default: gn.setSymbolSize(18);
+                        }
+                        nodeMap.put(id, gn);
+                    }
+                }
+
+                if (rs != null) {
+                    for (org.neo4j.driver.types.Relationship r : rs) {
+                        String source = String.valueOf(r.startNodeId());
+                        String target = String.valueOf(r.endNodeId());
+                        String name = r.type();
+                        String key = source + "->" + target + ":" + name;
+                        if (linkSet.add(key)) {
+                            GraphLink gl = new GraphLink();
+                            gl.setSource(source);
+                            gl.setTarget(target);
+                            gl.setName(name);
+                            gl.setValue(1);
+                            links.add(gl);
+                        }
+                    }
+                }
+            }
+
+            graphData.setNodes(new ArrayList<>(nodeMap.values()));
+            graphData.setLinks(links);
+            redisUtil.set(cacheKey, graphData, 1, java.util.concurrent.TimeUnit.HOURS);
+            return graphData;
+        } catch (Exception e) {
+            log.error("查询全量图谱失败", e);
+            throw new RuntimeException("查询全量图谱失败：" + e.getMessage());
+        }
     }
     
     @Override
@@ -137,7 +214,14 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         }
         
         List<Disease> diseases = diseaseRepository.findAll();
-        List<Object> result = new ArrayList<>(diseases);
+        // 去重（按name），并保持顺序
+        Map<String, Disease> uniq = new LinkedHashMap<>();
+        for (Disease d : diseases) {
+            if (d != null && d.getName() != null && !d.getName().isBlank()) {
+                uniq.putIfAbsent(d.getName(), d);
+            }
+        }
+        List<Object> result = new ArrayList<>(uniq.values());
         
         // 缓存1小时
         redisUtil.set(cacheKey, result, 1, java.util.concurrent.TimeUnit.HOURS);

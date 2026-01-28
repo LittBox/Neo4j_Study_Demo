@@ -23,4 +23,9 @@ public interface KnowledgeGraphService {
      * 获取所有疾病列表
      */
     List<Object> getAllDiseases();
+
+    /**
+     * 获取全量图谱（用于页面初始展示）
+     */
+    GraphData getFullGraph(int depth, int limit);
 }
